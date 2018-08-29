@@ -12,6 +12,8 @@ import org.kohsuke.github.GHPullRequestCommitDetail;
 import org.kohsuke.github.GHPullRequestFileDetail;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitUser;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHCommitState;
 
 import java.io.IOException;
 import java.net.URL;
@@ -388,10 +390,8 @@ public class GhprbPullRequest {
                     );
                 }
             }
-        } catch (Error e) {
+        } catch (Error | IOException e) {
             LOGGER.log(Level.SEVERE, "Exception caught while updating the PR", e);
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Exception caught while updating the PR", ex);
         }
     }
 
@@ -530,7 +530,19 @@ public class GhprbPullRequest {
             }
 
             if (shouldRun && !containsWatchedPaths(pr)) {
+                if (helper.getTrigger().getEnableInPathGHStatusUpdate()) {
+                    String message = "Pull request contains no watched paths, skipping the build";
+                    GHRepository repo = pr.getRepository();
+                    try {
+                        repo.createCommitStatus(pr.getHead().getSha(),
+                                GHCommitState.SUCCESS, "",
+                                message, this.helper.getTrigger().getProjectName());
+                    } catch (IOException ex) {
+                        LOGGER.log(Level.WARNING, "Unable to update commit status for: " + pr.getHead().getSha(), ex);
+                    }
+                }
                 LOGGER.log(Level.FINEST, "Pull request contains no watched paths, skipping the build");
+
                 shouldRun = false;
             }
 
