@@ -44,6 +44,8 @@ class GhprbTriggerContext implements Context {
 
     String buildDescriptionTemplate;
 
+    boolean enableInPathGHStatusUpdate;
+
     String includedRegions;
 
     String excludedRegions;
@@ -289,6 +291,10 @@ class GhprbTriggerContext implements Context {
      */
     public void extensions(Runnable closure) {
         ContextExtensionPoint.executeInContext(closure, extensionContext);
+    }
+
+    public void enableInPathGHStatusUpdate(boolean enableInPathGHStatusUpdate) {
+        this.enableInPathGHStatusUpdate = enableInPathGHStatusUpdate;
     }
 
     public void includedRegions(String regions) {

@@ -111,6 +111,8 @@ public class GhprbTrigger extends GhprbTriggerBackwardsCompatible {
 
     private String whitelist;
 
+    private Boolean enableInPathGHStatusUpdate;
+
     private Boolean autoCloseFailedPullRequests;
 
     private Boolean displayBuildErrorsOnDownstreamBuilds;
@@ -197,6 +199,7 @@ public class GhprbTrigger extends GhprbTriggerBackwardsCompatible {
                         String blackListLabels,
                         String whiteListLabels,
                         List<GhprbExtension> extensions,
+                        Boolean enableInPathGHStatusUpdate,
                         String includedRegions,
                         String excludedRegions
     ) throws ANTLRException {
@@ -222,6 +225,7 @@ public class GhprbTrigger extends GhprbTriggerBackwardsCompatible {
         this.whiteListLabels = whiteListLabels;
         this.includedRegions = includedRegions;
         this.excludedRegions = excludedRegions;
+        this.enableInPathGHStatusUpdate = enableInPathGHStatusUpdate;
         setExtensions(extensions);
         configVersion = LATEST_VERSION;
     }
@@ -645,6 +649,10 @@ public class GhprbTrigger extends GhprbTriggerBackwardsCompatible {
 
     public List<GhprbBranch> getBlackListTargetBranches() {
         return normalizeTargetBranches(blackListTargetBranches);
+    }
+
+    public boolean getEnableInPathGHStatusUpdate() {
+        return enableInPathGHStatusUpdate;
     }
 
     public String getIncludedRegions() {

@@ -11,7 +11,7 @@
 
     <artifactId>ghprb</artifactId>
     <name>GitHub Pull Request Builder</name>
-    <version>1.42.1-SNAPSHOT</version>
+    <version>1.42.0-report-pass</version>
     <packaging>hpi</packaging>
 
     <url>https://wiki.jenkins-ci.org/display/JENKINS/GitHub+pull+request+builder+plugin</url>
@@ -36,15 +36,15 @@
     </developers>
 
     <scm>
-        <connection>scm:git:ssh://github.com/jenkinsci/ghprb-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jenkinsci/ghprb-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/ghprb-plugin</url>
-        <tag>HEAD</tag>
+        <connection>scm:git:ssh://github.com/deepfield/ghprb-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/deepfield/ghprb-plugin.git</developerConnection>
+        <url>https://github.com/deepfield/ghprb-plugin</url>
+        <tag>1.42.0-report-pass</tag>
     </scm>
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/janinko/ghprb/issues</url>
+        <url>https://github.com/deepfield/ghprb/issues</url>
     </issueManagement>
 
     <properties>
