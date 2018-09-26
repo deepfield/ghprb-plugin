@@ -262,9 +262,9 @@ public class GhprbPullRequest {
                     }
                 }
 
+                shouldRun = containsWhiteListLabel;
                 if (!containsWhiteListLabel) {
                     LOGGER.log(Level.INFO, "Can't find any of whitelist label.");
-                    shouldRun = false;
                 }
             } catch (Error e) {
                 LOGGER.log(Level.SEVERE, "Failed to read whitelist labels", e);
