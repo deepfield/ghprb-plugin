@@ -257,7 +257,6 @@ public class GhprbPullRequest {
                                 "Found label {0} in whitelist",
                                 label.getName());
                         containsWhiteListLabel = true;
-                        shouldRun = true;
                     }
                 }
                 if (!containsWhiteListLabel) {
@@ -543,10 +542,9 @@ public class GhprbPullRequest {
             }
 
             if (shouldRun) {
+                checkWhiteListLabels();
                 checkBlackListLabels();
             }
-
-            checkWhiteListLabels();
 
             if (shouldRun) {
                 shouldRun = false; // Change the shouldRun flag as soon as we decide to build.
