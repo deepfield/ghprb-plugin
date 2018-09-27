@@ -223,8 +223,6 @@ public class GhprbPullRequest {
         updatePR(ghpr, null /*GHIssueComment*/, isWebhook);
         commitAuthor = getPRCommitAuthor();
         checkSkipBuild();
-        checkBlackListLabels();
-        checkWhiteListLabels();
         tryBuild();
     }
 
@@ -259,12 +257,12 @@ public class GhprbPullRequest {
                                 "Found label {0} in whitelist",
                                 label.getName());
                         containsWhiteListLabel = true;
+                        shouldRun = true;
                     }
                 }
-
-                shouldRun = containsWhiteListLabel;
                 if (!containsWhiteListLabel) {
                     LOGGER.log(Level.INFO, "Can't find any of whitelist label.");
+                    shouldRun = false;
                 }
             } catch (Error e) {
                 LOGGER.log(Level.SEVERE, "Failed to read whitelist labels", e);
@@ -307,8 +305,6 @@ public class GhprbPullRequest {
         // reset PR commit author
         commitAuthor = null;
         checkSkipBuild();
-        checkBlackListLabels();
-        checkWhiteListLabels();
         tryBuild();
     }
 
@@ -545,6 +541,12 @@ public class GhprbPullRequest {
 
                 shouldRun = false;
             }
+
+            if (shouldRun) {
+                checkBlackListLabels();
+            }
+
+            checkWhiteListLabels();
 
             if (shouldRun) {
                 shouldRun = false; // Change the shouldRun flag as soon as we decide to build.
