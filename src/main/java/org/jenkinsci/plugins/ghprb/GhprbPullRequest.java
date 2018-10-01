@@ -87,6 +87,8 @@ public class GhprbPullRequest {
 
     private transient boolean shouldRun = false; // Declares if we should run the build this time.
 
+    private transient boolean everRun = false;
+
     private transient boolean triggered = false; // Only lets us know if the trigger phrase was used for this run
 
     private transient boolean mergeable = false; // Only works as an easy way to pass the value around for the start of
@@ -227,46 +229,57 @@ public class GhprbPullRequest {
     }
 
     private void checkBlackListLabels() {
-        Set<String> labelsToIgnore = helper.getBlackListLabels();
-        if (labelsToIgnore != null && !labelsToIgnore.isEmpty()) {
-            try {
-                for (GHLabel label : pr.getLabels()) {
-                    if (labelsToIgnore.contains(label.getName())) {
-                        LOGGER.log(Level.INFO,
-                                "Found label {0} in ignore list, pull request will be ignored.",
-                                label.getName());
-                        shouldRun = false;
+        synchronized (this) {
+            Set<String> labelsToIgnore = helper.getBlackListLabels();
+            if (labelsToIgnore != null && !labelsToIgnore.isEmpty()) {
+                try {
+                    for (GHLabel label : pr.getLabels()) {
+                        if (labelsToIgnore.contains(label.getName())) {
+                            LOGGER.log(Level.INFO,
+                                    "Found label {0} in ignore list, pull request will be ignored.",
+                                    label.getName());
+                            shouldRun = false;
+                        }
                     }
+                } catch (Error e) {
+                    LOGGER.log(Level.SEVERE, "Failed to read blacklist labels", e);
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Failed to read blacklist labels", e);
                 }
-            } catch (Error e) {
-                LOGGER.log(Level.SEVERE, "Failed to read blacklist labels", e);
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Failed to read blacklist labels", e);
             }
         }
     }
 
     private void checkWhiteListLabels() {
-        Set<String> labelsMustContain = helper.getWhiteListLabels();
-        if (labelsMustContain != null && !labelsMustContain.isEmpty()) {
-            boolean containsWhiteListLabel = false;
-            try {
-                for (GHLabel label : pr.getLabels()) {
-                    if (labelsMustContain.contains(label.getName())) {
-                        LOGGER.log(Level.INFO,
-                                "Found label {0} in whitelist",
-                                label.getName());
-                        containsWhiteListLabel = true;
+        synchronized (this) {
+            Set<String> labelsMustContain = helper.getWhiteListLabels();
+            if (labelsMustContain != null && !labelsMustContain.isEmpty()) {
+                boolean containsWhiteListLabel = false;
+                try {
+                    for (GHLabel label : pr.getLabels()) {
+                        if (labelsMustContain.contains(label.getName())) {
+                            LOGGER.log(Level.INFO,
+                                    "Found label {0} in whitelist",
+                                    label.getName());
+                            containsWhiteListLabel = true;
+                            if (!everRun) {
+                                shouldRun = true;
+                                everRun = true;
+                                LOGGER.log(Level.INFO,
+                                        "Triggering first build from label change on PR {0}.",
+                                        pr.getId());
+                            }
+                        }
                     }
+                    if (!containsWhiteListLabel) {
+                        LOGGER.log(Level.INFO, "Can't find any of whitelist label.");
+                        shouldRun = false;
+                    }
+                } catch (Error e) {
+                    LOGGER.log(Level.SEVERE, "Failed to read whitelist labels", e);
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Failed to read whitelist labels", e);
                 }
-                if (!containsWhiteListLabel) {
-                    LOGGER.log(Level.INFO, "Can't find any of whitelist label.");
-                    shouldRun = false;
-                }
-            } catch (Error e) {
-                LOGGER.log(Level.SEVERE, "Failed to read whitelist labels", e);
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Failed to read whitelist labels", e);
             }
         }
     }
@@ -508,6 +521,7 @@ public class GhprbPullRequest {
 
     private void tryBuild() {
         synchronized (this) {
+            checkWhiteListLabels();
             if (helper.isProjectDisabled()) {
                 LOGGER.log(Level.FINEST, "Project is disabled, not trying to build");
                 shouldRun = false;
@@ -542,7 +556,6 @@ public class GhprbPullRequest {
             }
 
             if (shouldRun) {
-                checkWhiteListLabels();
                 checkBlackListLabels();
             }
 
