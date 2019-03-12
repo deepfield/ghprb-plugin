@@ -82,7 +82,7 @@ f.advanced() {
       }
     }
   }
-  f.entry(field: "enableInPathGHStatusUpdate", title: "Enabling updating status to success when watched regions are false") {
+  f.entry(field: "enableInPathGHStatusUpdate", title: "Report success status when watched regions aren't modified") {
     f.checkbox()
   }
   f.entry(field: "includedRegions", title: _("Included regions")) {
