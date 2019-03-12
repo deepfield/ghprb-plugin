@@ -256,18 +256,18 @@ public class GhprbPullRequest {
             if (labelsMustContain != null && !labelsMustContain.isEmpty()) {
                 boolean containsWhiteListLabel = false;
                 try {
-                    for (GHLabel label : pr.getLabels()) {
+                    for (GHLabel label : this.pr.getLabels()) {
                         if (labelsMustContain.contains(label.getName())) {
                             LOGGER.log(Level.INFO,
                                     "Found label {0} in whitelist",
                                     label.getName());
                             containsWhiteListLabel = true;
-                            if (!everRun) {
-                                shouldRun = true;
-                                everRun = true;
+                            if (!this.everRun) {
+                                this.shouldRun = true;
+                                this.everRun = true;
                                 LOGGER.log(Level.INFO,
                                         "Triggering first build from label change on PR {0}.",
-                                        pr.getId());
+                                        this.pr.getId());
                             }
                         }
                     }
