@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.ghprb.extensions.build;
 
 import hudson.Extension;
-import hudson.model.AbstractProject;
 import hudson.model.Cause;
 import hudson.model.Job;
 import hudson.model.Queue;
@@ -19,6 +18,7 @@ import org.jenkinsci.plugins.ghprb.extensions.GhprbGlobalExtension;
 import org.jenkinsci.plugins.ghprb.extensions.GhprbProjectExtension;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,7 +41,7 @@ public class GhprbCancelBuildsOnUpdate extends GhprbExtension implements
         return overrideGlobal == null ? Boolean.valueOf(false) : overrideGlobal;
     }
 
-    private void cancelCurrentBuilds(Job<?, ?> project,
+    protected void cancelCurrentBuilds(Job<?, ?> project,
                                      Integer prId) {
         if (getOverrideGlobal()) {
             return;
@@ -53,9 +53,11 @@ public class GhprbCancelBuildsOnUpdate extends GhprbExtension implements
                         + ", checking for queued items to cancel."
         );
 
-        if (project instanceof AbstractProject<?, ?>) {
-            Queue queue = Jenkins.getInstance().getQueue();
-            for (Queue.Item queueItem : queue.getItems((AbstractProject<?, ?>) project)) {
+        Queue queue = Jenkins.getInstance().getQueue();
+        Queue.Item item = project.getQueueItem();
+        if (item != null) {
+            List<Queue.Item> queueItems = queue.getItems(item.task);
+            for (Queue.Item queueItem : queueItems) {
                 GhprbCause qcause = null;
 
                 for (Cause cause : queueItem.getCauses()) {
@@ -63,7 +65,6 @@ public class GhprbCancelBuildsOnUpdate extends GhprbExtension implements
                         qcause = (GhprbCause) cause;
                     }
                 }
-
                 if (qcause != null && qcause.getPullID() == prId) {
                     try {
                         LOGGER.log(
