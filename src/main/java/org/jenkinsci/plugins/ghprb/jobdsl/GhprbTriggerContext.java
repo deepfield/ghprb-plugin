@@ -42,6 +42,8 @@ class GhprbTriggerContext implements Context {
 
     boolean displayBuildErrorsOnDownstreamBuilds;
 
+    String gitHubAuthId;
+
     String buildDescriptionTemplate;
 
     boolean enableInPathGHStatusUpdate;
@@ -277,6 +279,14 @@ class GhprbTriggerContext implements Context {
      */
     public void displayBuildErrorsOnDownstreamBuilds() {
         displayBuildErrorsOnDownstreamBuilds(true);
+    }
+
+    /**
+     * When filled, changes the github authorization token to other than default
+     */
+
+    public void gitHubAuthId(String gitHubAuthId) {
+        this.gitHubAuthId = gitHubAuthId;
     }
 
     /**

@@ -39,7 +39,7 @@ public class GhprbContextExtensionPoint extends ContextExtensionPoint {
                 null,
                 null,
                 null,
-                null,
+                context.gitHubAuthId,
                 context.buildDescriptionTemplate,
                 Joiner.on("\n").join(context.blackListLabels),
                 Joiner.on("\n").join(context.whiteListLabels),
