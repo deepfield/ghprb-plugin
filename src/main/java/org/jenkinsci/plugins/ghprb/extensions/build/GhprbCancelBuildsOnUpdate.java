@@ -92,7 +92,7 @@ public class GhprbCancelBuildsOnUpdate extends GhprbExtension implements
             if (cause.getPullID() == prId && cause.getCommit() != commit) {
                 try {
                     LOGGER.log(Level.FINER, "Cancelling running build #{1} of {2} for PR #{3} with commit {4}",
-                            new Object[] { run.getNumber(), project.getName(), cause.getPullID(), cause.getCommit() });
+                            new Object[] {run.getNumber(), project.getName(), cause.getPullID(), cause.getCommit()});
                     run.addAction(this);
                     run.getExecutor().interrupt(Result.ABORTED);
                 } catch (Exception e) {
