@@ -92,6 +92,7 @@ public class GhprbPullRequestTest {
         @SuppressWarnings("unchecked")
         PagedIterator<GHPullRequestFileDetail> pagedIterator = mock(PagedIterator.class);
         given(pagedIterable.iterator()).willReturn(pagedIterator);
+        given(pagedIterable.withPageSize(100)).willReturn(pagedIterable);
         given(pr.listFiles()).willReturn(pagedIterable);
 
         // Create the list of file paths to return
@@ -217,7 +218,7 @@ public class GhprbPullRequestTest {
         // GIVEN
         String expectedAuthorRepoGitUrl = "https://github.com/jenkinsci/ghprb-plugin";
         GHRepository repository = mock(GHRepository.class);
-        given(repository.gitHttpTransportUrl()).willReturn(expectedAuthorRepoGitUrl);
+        given(repository.getHttpTransportUrl()).willReturn(expectedAuthorRepoGitUrl);
 
         given(head.getRepository()).willReturn(repository);
 

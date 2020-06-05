@@ -41,8 +41,7 @@ public class GhprbCancelBuildsOnUpdate extends GhprbExtension implements
         return overrideGlobal == null ? Boolean.valueOf(false) : overrideGlobal;
     }
 
-    protected void cancelCurrentBuilds(Job<?, ?> project,
-                                     Integer prId) {
+    protected void cancelCurrentBuilds(Job<?, ?> project, Integer prId, String commit) {
         if (getOverrideGlobal()) {
             return;
         }
@@ -65,7 +64,7 @@ public class GhprbCancelBuildsOnUpdate extends GhprbExtension implements
                         qcause = (GhprbCause) cause;
                     }
                 }
-                if (qcause != null && qcause.getPullID() == prId) {
+                if (qcause != null && qcause.getPullID() == prId && qcause.getCommit() != commit) {
                     try {
                         LOGGER.log(
                                 Level.FINER,
@@ -90,13 +89,10 @@ public class GhprbCancelBuildsOnUpdate extends GhprbExtension implements
             if (cause == null) {
                 continue;
             }
-            if (cause.getPullID() == prId) {
+            if (cause.getPullID() == prId && cause.getCommit() != commit) {
                 try {
-                    LOGGER.log(
-                            Level.FINER,
-                            "Cancelling running build #" + run.getNumber() + " of "
-                                    + project.getName() + " for PR # " + cause.getPullID()
-                    );
+                    LOGGER.log(Level.FINER, "Cancelling running build #{1} of {2} for PR #{3} with commit {4}",
+                            new Object[] {run.getNumber(), project.getName(), cause.getPullID(), cause.getCommit()});
                     run.addAction(this);
                     run.getExecutor().interrupt(Result.ABORTED);
                 } catch (Exception e) {
@@ -112,7 +108,7 @@ public class GhprbCancelBuildsOnUpdate extends GhprbExtension implements
             return;
         }
         if (project.isBuilding() || project.isInQueue()) {
-            cancelCurrentBuilds(project, cause.getPullID());
+            cancelCurrentBuilds(project, cause.getPullID(), cause.getCommit());
         }
     }
 
